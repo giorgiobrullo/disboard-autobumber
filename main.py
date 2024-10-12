@@ -1,7 +1,6 @@
 import os
 import asyncio
 import logging
-import colorlog
 from discord.ext.commands import Bot
 from random import randint
 from dotenv import load_dotenv
@@ -9,35 +8,14 @@ from dotenv import load_dotenv
 # Load environment variables from a .env file if using one
 load_dotenv()
 
-# Set up custom log level colors
-log_colors = {
-    'DEBUG': 'cyan',
-    'INFO': 'blue',
-    'WARNING': 'yellow',
-    'ERROR': 'red',
-    'CRITICAL': 'bold_red',
-}
+# Get the logger for 'discord' (this includes 'discord.client' and 'discord.http')
+logger = logging.getLogger('discord')
 
-# Define the log formatter with precise color settings for each part
-log_formatter = colorlog.ColoredFormatter(
-    # Gray for the timestamp, color for log level, purple for logger name, white for message
-    "\033[90m%(asctime)s\033[0m "
-    "%(log_color)s%(levelname)-8s\033[0m "
-    "\033[35m%(name)-20s\033[0m %(message)s",
-    datefmt='%Y-%m-%d %H:%M:%S',
-    log_colors=log_colors,
-    secondary_log_colors={},
-    style='%'
-)
-
-# Create a handler for console output
-console_handler = logging.StreamHandler()
-console_handler.setFormatter(log_formatter)
-
-# Get the root logger and set the logging level
-logger = logging.getLogger('discord.client')  # using 'discord.client' to match the logger name style
+# Set the logging level to INFO (or whatever level you need)
 logger.setLevel(logging.INFO)
-logger.addHandler(console_handler)
+
+# Remove any custom handlers, and rely on discord.py-self's default logging
+# This will use discord.py-self's existing logging configuration and avoid duplicates
 
 # Retrieve the token and log channel from environment variables to string
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -76,7 +54,5 @@ async def bump(channel):
         if command.name == "bump" and command.application_id == 302050872383242240:
             await command(channel)
             await asyncio.sleep(5)
-
-
 
 bot.run(TOKEN)
